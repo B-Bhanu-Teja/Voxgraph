@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<launch>
+  <arg name="play_bag" default="true" />
+  <arg name="bag_file" default="/path/to/RS_d1_30Hz.bag"/>
+  <arg name="voxel_size" default="0.05"/>
+  <arg name="process_every_nth_frame" default="5" />
+  <arg name="scale" default="0.5" />
+
+  <!-- These are the datasets from http://www.v4rl.ethz.ch/research/datasets-code/V4RL-Dense-Reconstruction-Dataset.html -->
+
+  <!-- <node name="player" pkg="rosbag" type="play" output="screen" args=" -r 1.0 clock $(arg bag_file)" if="$(arg play_bag)"/> -->
+
+  <node name="dense_stereo" pkg="image_undistort" type="dense_stereo_node">
+    <param name="input_camera_info_from_ros_params" value = "false"/>
+    <param name="first_camera_namespace" value="infra1"/>
+    <param name="second_camera_namespace" value="infra2"/>
+    <param name="world_frame" value="world"/>
+    <param name="first_output_frame" value="camera_infra1_optical_frame"/>
+    <param name="second_output_frame" value="camera_infra2_optical_frame"/>
+    <param name="scale" value="$(arg scale)"/>
+    <param name="process_every_nth_frame" value="$(arg process_every_nth_frame)"/>
+
+    <rosparam file="$(find voxblox_ros)/cfg/calibrations/euroc_camchain.yaml"/>
+
+    <remap from="raw/first/image" to="camera/infra1/image_rect_raw"/>
+    <remap from="raw/second/image" to="camera/infra2/image_rect_raw"/>
+    <remap from="raw/first/camera_info" to="camera/infra1/camera_info"/>
+    <remap from="raw/second/camera_info" to="camera/infra2/camera_info"/>
+  </node>
+
+
+  
+</launch>
